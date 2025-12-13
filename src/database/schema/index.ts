@@ -1,19 +1,31 @@
-import { accounts } from './accounts';
 import {
+    accounts,
     accountsRelations,
+    invitations,
+    invitationsRelations,
+    members,
+    membersRelations,
+    organizations,
+    organizationsRelations,
+    sessions,
     sessionsRelations,
+    users,
     usersRelations,
-} from './relations';
-import { sessions } from './sessions';
-import { users } from './user';
-import { verifications } from './verifications';
+    verifications,
+} from './auth-schema';
 
 export const schema = {
     users,
-    accounts,
     sessions,
+    accounts,
     verifications,
+    organizations,
+    members,
+    invitations,
     usersRelations,
     sessionsRelations,
     accountsRelations,
+    organizationsRelations,
+    membersRelations,
+    invitationsRelations,
 };

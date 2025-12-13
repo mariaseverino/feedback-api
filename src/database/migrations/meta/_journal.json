@@ -8,6 +8,13 @@
       "when": 1765497898089,
       "tag": "0000_sour_landau",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1765551340572,
+      "tag": "0001_normal_blazing_skull",
+      "breakpoints": true
     }
   ]
 }
