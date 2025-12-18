@@ -6,6 +6,9 @@ COPY . .
 
 RUN npm install
 
+# RUN npm run db:generate
+
+
 EXPOSE 3333
 
-CMD ["npm", "run", "dev"]
+# CMD ["npm", "run", "dev"]

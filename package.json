@@ -4,10 +4,10 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "dev": "tsx watch --env-file=.env src/server.ts",
+        "dev": "tsx watch src/server.ts",
         "start": "node dist/server.js",
-        "db:generate": "npx --env-file=.env drizzle-kit generate",
-        "db:migrate": "npx --env-file=.env drizzle-kit migrate"
+        "db:generate": "npx drizzle-kit generate",
+        "db:migrate": "npx drizzle-kit migrate"
     },
     "keywords": [],
     "author": "",
@@ -29,6 +29,7 @@
         "bcrypt": "^6.0.0",
         "better-auth": "^1.4.6",
         "cors": "^2.8.5",
+        "dotenv": "^17.2.3",
         "drizzle-orm": "^0.45.1",
         "express": "^5.2.1",
         "express-list-endpoints": "^7.1.1",
