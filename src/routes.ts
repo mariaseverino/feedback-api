@@ -1,10 +1,16 @@
 import express from 'express';
 import { UserController } from './users/UserController';
+import { ensureAuthenticated } from './midleware/ensureAuthenticated';
 
-const router = express().router;
+const routes = express().router;
 
 const userController = new UserController();
 
-router.get('/me', userController.getMe);
+routes.get('/me', ensureAuthenticated, userController.getMe);
+routes.delete(
+    '/delete-account',
+    ensureAuthenticated,
+    userController.deleteMyAccount
+);
 
-export default router;
+export default routes;
