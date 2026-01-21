@@ -1,5 +1,6 @@
 import { db } from '@/database/client';
 import { members, organizations } from '@/database/schema/auth-schema';
+import { MailService } from '@/services/mailService';
 import { compare, hash } from 'bcrypt';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
@@ -36,7 +37,7 @@ export const auth = betterAuth({
                     .select({ organizationId: members.organizationId })
                     .from(members)
                     .where(
-                        and(eq(members.userId, id), eq(members.role, 'owner'))
+                        and(eq(members.userId, id), eq(members.role, 'owner')),
                     )
                     .limit(1)
                     .then((res) => res[0]);
@@ -47,8 +48,8 @@ export const auth = betterAuth({
                         .where(
                             eq(
                                 organizations.id,
-                                userIsOwnerMember.organizationId
-                            )
+                                userIsOwnerMember.organizationId,
+                            ),
                         );
                 }
             },
@@ -74,7 +75,7 @@ export const auth = betterAuth({
                 }) => {
                     // Custom validation or expiration logic
                     const customExpiration = new Date(
-                        Date.now() + 1000 * 60 * 60 * 24 * 7
+                        Date.now() + 1000 * 60 * 60 * 24 * 7,
                     ); // 7 days
                     return {
                         data: {
@@ -82,6 +83,17 @@ export const auth = betterAuth({
                             expiresAt: customExpiration,
                         },
                     };
+                },
+                cancelPendingInvitationsOnReInvite: true,
+                requireEmailVerificationOnInvitation: true,
+                afterCreateInvitation: async ({ invitation }) => {
+                    console.log(invitation);
+                    const mailService = new MailService();
+
+                    await mailService.sendInviteEmail({
+                        to: invitation.email,
+                        invitationId: invitation.id,
+                    });
                 },
 
                 // afterAddMember: async ({ member, user, organization }) => {

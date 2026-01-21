@@ -3,21 +3,15 @@ import { members, organizations, users } from '@/database/schema/auth-schema';
 import { email, Session, User } from 'better-auth';
 import { organization } from 'better-auth/plugins';
 import { and, eq } from 'drizzle-orm';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
-interface SessionWithActiveOrganization extends Session {
-    activeOrganizationId: string | null;
-}
-
-interface AuthRequest extends Request {
-    auth: {
-        user: User;
-        session: SessionWithActiveOrganization;
-    };
-}
 export class UserController {
-    async getMe(request: AuthRequest, response: Response) {
-        console.log(request.auth.session);
+    async getMe(request: Request, response: Response, next: NextFunction) {
+        console.log(request.auth?.session);
+
+        if (!request.auth) {
+            return response.status(401).json({ message: 'Não autenticado' });
+        }
 
         const user = await db
             .select({
@@ -29,7 +23,7 @@ export class UserController {
                 organizationName: organizations.name,
             })
             .from(users)
-            .leftJoin(members, eq(members.userId, request.auth.session.userId))
+            .leftJoin(members, eq(members.userId, request.auth?.session.userId))
             .leftJoin(
                 organizations,
                 eq(organizations.id, members.organizationId)
@@ -53,23 +47,23 @@ export class UserController {
         });
     }
 
-    async deleteMyAccount(request: AuthRequest, response: Response) {
-        const memberships = await db.query.members.findMany({
-            where: eq(members.userId, request.auth.user.id),
-        });
+    // async deleteMyAccount(request: Request, response: Response) {
+    //     const memberships = await db.query.members.findMany({
+    //         where: eq(members.userId, request.auth?.session.userId!),
+    //     });
 
-        for (const membership of memberships) {
-            if (membership.role === 'owner') {
-                await db
-                    .delete(organizations)
-                    .where(eq(organizations.id, membership.organizationId));
-            } else {
-                await db.delete(members).where(eq(members.id, membership.id));
-            }
-        }
+    //     for (const membership of memberships) {
+    //         if (membership.role === 'owner') {
+    //             await db
+    //                 .delete(organizations)
+    //                 .where(eq(organizations.id, membership.organizationId));
+    //         } else {
+    //             await db.delete(members).where(eq(members.id, membership.id));
+    //         }
+    //     }
 
-        await db.delete(users).where(eq(users.id, request.auth.user.id));
+    //     await db.delete(users).where(eq(users.id, request.auth?.session.userId!));
 
-        return response.status(200).json({ menssage: 'Adeus!' });
-    }
+    //     return response.status(200).json({ menssage: 'Adeus!' });
+    // }
 }
